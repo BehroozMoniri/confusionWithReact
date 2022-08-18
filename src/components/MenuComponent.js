@@ -27,7 +27,7 @@ import { Link } from 'react-router-dom';
     //     console.log('renders menu component');
 function RenderMenuItem ({dish}) {
     return (
-        <Card>
+        <Card >
             <Link to={`/menu/${dish.id}`} >
                 <CardImg width="100%" src={dish.image} alt={dish.name} />
                 <CardImgOverlay>
