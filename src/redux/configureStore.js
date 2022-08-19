@@ -16,6 +16,7 @@ export const ConfigureStore = () => {
     comments:Comments,
     promotions: Promotions,
     leaders: Leaders,
+    
     ...createForms({
         feedback: InitialFeedback
     })    

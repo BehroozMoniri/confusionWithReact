@@ -1,8 +1,6 @@
 import { DISHES } from '../shared/dishes';
 
 
-
-
 export const initialState = {
     dishes: DISHES,
     comments: COMMENTS,

@@ -1,7 +1,12 @@
 import React, { Component } from "react";
 import { Card, CardImg, CardText, CardBody, CardTitle, Modal, ModalHeader, ModalBody, Breadcrumb, BreadcrumbItem, Button, Row, Col, Label } from "reactstrap";
-import { Control, LocalForm, Errors } from "react-redux-form";
+import { Control, Form, Errors } from "react-redux-form";
+ 
 import { Link } from "react-router-dom";
+import {baseUrl } from '../shared/baseUrl'; 
+import {FadeTransform, Fade, Stagger } from 'react-animation-components';
+
+
 
 const required = val => val && val.length;
 const maxLength = len => val => !val || val.length <= len;
@@ -25,7 +30,8 @@ class CommentForm extends Component {
 
     handleSubmit(values) {
         console.log("Current State is: " + JSON.stringify(values));
-        this.props.addComment(this.props.dishId, values.rating, values.author, values.comment);
+        this.props.postComment(this.props.dishId, values.rating, values.author, values.comment);
+        this.props.resetFeedbackForm();
     }
 
     render() {
@@ -35,7 +41,8 @@ class CommentForm extends Component {
                 <Modal isOpen={this.state.isModalOpen} toggle={this.toggleModal}>
                     <ModalHeader toggle={this.toggleModal}>Submit Comment</ModalHeader>
                     <ModalBody>
-                        <LocalForm onSubmit={this.handleSubmit}>
+                        {/* <LocalForm onSubmit={this.handleSubmit}> */}
+                        <Form model="feedback" onSubmit={(values) => this.handleSubmit(values)}>
                             <Row className="form-group">
                                 <Label htmlFor="rating" md={12}>Rating</Label>
                                 <Col md={{ size: 12 }}>
@@ -70,7 +77,8 @@ class CommentForm extends Component {
                                 </Col>
                             </Row>
                             <Button type="submit" value="submit" color="primary">Submit</Button>
-                        </LocalForm>
+                            {/* </LocalForm > */}
+                        </Form >
                     </ModalBody>
                 </Modal>
             </div>
@@ -81,21 +89,25 @@ class CommentForm extends Component {
 function RenderDish({ dish }) {
     return (
         <div className="col-12 col-md-5 m-1">
-            <Card>
-                <CardImg top src={dish.image} alt={dish.name}/>
-                <CardBody>
-                    <CardTitle>{dish.name}</CardTitle>
-                    <CardText>{dish.description}</CardText>
-                </CardBody>
-            </Card>
+            <FadeTransform in transformProps = {{ exitTransform: 'scale(0.5) translateY(-50%'}} > 
+
+                <Card>
+                    <CardImg top src={baseUrl + dish.image} alt={dish.name}/>
+                    <CardBody>
+                        <CardTitle>{dish.name}</CardTitle>
+                        <CardText>{dish.description}</CardText>
+                    </CardBody>
+                </Card>
+            </FadeTransform>
         </div>
     );
 }
 
-function RenderComments({comments, addComment, dishId}) {
+function RenderComments({comments, postComment, dishId}) {
     if (comments != null) {
         const dishComments = comments.map(comment => {
             return (
+
                 <li key={comment.id}>
                     <p>{comment.comment}</p>
                     <p>-- <strong>{comment.author}</strong>, {new Intl.DateTimeFormat('en-US', {
@@ -109,13 +121,17 @@ function RenderComments({comments, addComment, dishId}) {
             )
         });
         return (
+        <Stagger in >
             <div className='col-12 col-md-5 m-1'>
                 <h4>Comments</h4>
                 <ul className='list-unstyled'>
+                        <Fade in>
                     {dishComments}
+                        </Fade>
                 </ul>
-                <CommentForm dishId={dishId} addComment={addComment} />
+                <CommentForm dishId={dishId} postComment={postComment} />
             </div>
+        </Stagger>
         );
     } else return <div/>;
 }
@@ -137,7 +153,7 @@ const DishDetailComponent = props => (
         <div className="row">
             <RenderDish dish={props.dish}/>
             <RenderComments comments={props.comments}        
-                addComment={props.addComment}
+                postComment={props.postComment}
                 dishId={props.dish.id}  />
         </div>
        
